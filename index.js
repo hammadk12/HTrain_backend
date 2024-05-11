@@ -1,38 +1,38 @@
-require('dotenv').config()
 const express = require('express');
-const { createProxyMiddleware } = require('http-proxy-middleware')
-const app = express();
-const PORT = 5000;
+const axios = require('axios')
+const NodeCache = require('node-cache')
+const cache = new NodeCache ({ stdTTL: 300 })
 const cors = require('cors')
+require('dotenv').config()
+const app = express();
+const PORT = process.env.PORT || 5000;
 
 app.use(cors())
 
-app.get('/api/api-key', (req, res) => {
-    res.json({ apiKey: process.env.BACKEND_API_KEY });
+app.get('/api/api-key', async (req, res) => {
+    const cacheKey = 'exerciseData'
+    const cachedData = cache.get(cacheKey)
+
+    if (cachedData) {
+        console.log('Serving from cache')
+        return res.json(cachedData)
+    }
+
+  try {
+    const response = await axios.get('https://api.api-ninjas.com/v1/exercises', {
+        Headers: {
+            'X-API-KEY': process.env.BACKEND_API_KEY
+        }
+    })  
+    cache.set(cacheKey, response.data)
+    res.json(response.data)
+    } catch (error) {
+        console.error("Failed to fetch data:", error);
+        res.status(500).json({ error: 'Failed to fetch data' });
+    }
   });
   
-  // Middleware to check for API key
-  const checkApiKey = (req, res, next) => {
-    const apiKey = req.header('X-API-KEY');
-    if (!apiKey || apiKey !== process.env.BACKEND_API_KEY) {
-      return res.status(401).json({ message: 'Unauthorized' });
-    }
-    next();
-  };
-
-  // Proxy middleware configuration
-app.use(
-    '/api/exercises',
-    createProxyMiddleware({
-      target: 'https://api.api-ninjas.com',
-      changeOrigin: true,
-      pathRewrite: {
-        '^/api/exercises': '/v1/exercises',
-      },
-    })
-  );
-  
-  // Route handler for the root path
+// Route handler for the root path
 app.get('/', (req, res) => {
     res.send('Server is running');
   });
