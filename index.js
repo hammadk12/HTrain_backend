@@ -6,8 +6,7 @@ const cors = require('cors')
 require('dotenv').config()
 const app = express();
 const PORT = process.env.PORT || 5000;
-// const apiKey = process.env.BACKEND_API_KEY
-const apiKey = '+LNP8mg1hDCqYaUM+C6ElQ==xZ3S7GJWP3oQZBvU'
+const apiKey = process.env.API_KEY
 
 app.use(cors())
 
@@ -44,7 +43,7 @@ app.get('/api/exercises', async (req, res) => {
 
 // Route handler for the root path
 app.get('/', (req, res) => {
-    res.send('Server is running');
+    res.send('Server is running!!!!!!!!!!!!!');
   });
 
 app.listen(PORT, () => {
