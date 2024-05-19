@@ -3,13 +3,17 @@ const axios = require('axios')
 const NodeCache = require('node-cache')
 const cache = new NodeCache ({ stdTTL: 300 })
 const cors = require('cors')
+const axiosRetry = require('axios-retry')
 require('dotenv').config()
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 const apiKey = process.env.API_KEY
 const apiKey2 = process.env.API_KEY_E
 
 app.use(cors())
+
+axiosRetry(axios, { retries: 3, retryDelay: axiosRetry.exponentialDelay })
 
 // endpoint for api key 1
 app.get('/api/api-key', async (req, res) => {
@@ -50,7 +54,8 @@ app.get('/api/api-key2', async (req, res) => {
 
 // endpoint for exercises rapid-api
 app.get('/api/exercises-rapidapi', async (req, res) => {
-  const cacheKey = 'exerciseDataRapidAPI'
+  const { muscle, day } = req.query
+  const cacheKey = `exerciseDataRapidAPI_${day}_${muscle}`
   const cachedData = cache.get(cacheKey)
 
   if (cachedData && cachedData.muscle === req.query.muscle) {
@@ -59,7 +64,6 @@ app.get('/api/exercises-rapidapi', async (req, res) => {
   }
 
   try {
-    const muscle = req.query.muscle
     console.log("Received muscle:", muscle)
     const response = await axios ({
       method: 'GET', 
