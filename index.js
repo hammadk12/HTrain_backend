@@ -55,13 +55,12 @@ app.get('/api/api-key2', async (req, res) => {
 // endpoint for exercises rapid-api
 app.get('/api/exercises-rapidapi', async (req, res) => {
   const { muscle } = req.query
-  const timestamp = Date.now()
-  const cacheKey = `exerciseDataRapidAPI_${timestamp}_${muscle}`
+  const cacheKey = `exerciseDataRapidAPI`
   const cachedData = cache.get(cacheKey)
 
-  if (cachedData && cachedData.muscle === req.query.muscle) {
+  if (cachedData && Date.now() - cachedData.timestamp < 7200 * 1000 && cachedData.data[muscle]) {
     console.log('Serving from cache')
-    return res.json(cachedData)
+    return res.json(cachedData.data[muscle])
   }
 
   try {
@@ -75,7 +74,9 @@ app.get('/api/exercises-rapidapi', async (req, res) => {
         'X-RapidAPI-Host': 'work-out-api1.p.rapidapi.com',
       },
     })
-    cache.set(cacheKey, { muscle: muscle, data: response.data })
+    const newData = cachedData ? cachedData.data : {}
+    newData[muscle] = response.data
+    cache.set(cacheKey, { timestamp: Date.now(), data: newData })
     res.json(response.data)
   } catch (error) {
     console.error('Failed to fetch data:', error);
