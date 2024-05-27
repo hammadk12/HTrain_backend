@@ -1,6 +1,5 @@
 const express = require('express');
 const axios = require('axios')
-const axiosRetry = require('axios-retry')
 const NodeCache = require('node-cache')
 const cache = new NodeCache ({ stdTTL: 300 })
 const cors = require('cors')
@@ -13,7 +12,6 @@ const apiKey2 = process.env.API_KEY_E
 
 app.use(cors())
 
-// axiosRetry(axios, { retries: 3, retryDelay: axiosRetry.exponentialDelay })
 
 // endpoint for api key 1
 app.get('/api/api-key', async (req, res) => {
