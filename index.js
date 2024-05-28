@@ -1,7 +1,7 @@
 const express = require('express');
 const axios = require('axios')
 const NodeCache = require('node-cache')
-const cache = new NodeCache ({ stdTTL: 300 })
+const cache = new NodeCache ({ stdTTL: 7200 })
 const cors = require('cors')
 require('dotenv').config()
 
