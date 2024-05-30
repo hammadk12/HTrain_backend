@@ -10,11 +10,7 @@ const PORT = process.env.PORT || 5000;
 const apiKey = process.env.API_KEY
 const apiKey2 = process.env.API_KEY_E
 
-app.use(cors({
-  origin: 'https://htrain-frontend-hammads-projects-216b65c7.vercel.app',
-  methods: ['GET', 'POST'],
-  credentials: true, 
-}))
+app.use(cors())
 
 
 // endpoint for api key 1
