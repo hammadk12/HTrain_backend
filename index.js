@@ -15,11 +15,14 @@ app.use(cors())
 
 // endpoint for api key 1
 app.get('/api/api-key', async (req, res) => {
+  res.header('Access-Control-Allow-Origin', '*');
   res.json({ apiKey: apiKey })
 })
 
 // endpoint for exercises api-ninja
 app.get('/api/exercises', async (req, res) => {
+  res.header('Access-Control-Allow-Origin', '*');
+
   const cacheKey = 'exerciseData'
   const cachedData = cache.get(cacheKey)
   
@@ -47,11 +50,14 @@ app.get('/api/exercises', async (req, res) => {
 
 // endpoint for api key 2
 app.get('/api/api-key2', async (req, res) => {
+  res.header('Access-Control-Allow-Origin', '*');
   res.json({ apiKey2: apiKey2 })
 })
 
 // endpoint for exercises rapid-api
 app.get('/api/exercises-rapidapi', async (req, res) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  
   const { muscle } = req.query
   const cacheKey = `exerciseDataRapidAPI`
   const cachedData = cache.get(cacheKey)
