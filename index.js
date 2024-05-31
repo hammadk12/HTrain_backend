@@ -10,39 +10,36 @@ const apiKey = process.env.API_KEY
 const apiKey2 = process.env.API_KEY_E
 const cache = new NodeCache ({ stdTTL: 7200 })
 
-const allowedOrigings = [
+const allowedOrigins = [
   'https://htrain-frontend-hammads-projects-216b65c7.vercel.app',
   'https://htrain-frontend.vercel.app/'
 ]
 
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigings.incluides(origin)) {
-      callback(null, true)
-    } else {
-      callback(new Error('Not allowed by CORS'))
-    }
-  },
-  methods: ['GET', 'POST'],
-  credentials: true
-}))
+app.use(cors())
 
 // setting CORS headers explicitly
-app.use((req, res, next) => {
+const setCORSHeaders = (res) => {
   res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  next();
-})
+  res.header('Access-Control-Allow-Methods', 'GET, POST');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+}
 
 // endpoint for api key 1
 app.get('/api/api-key', async (req, res) => {
-  res.json({ apiKey: apiKey })
-})
+  try {
+    setCORSHeaders(res);
+    res.json({ apiKey: apiKey });
+  } catch (error) {
+    console.error('Error in /api/api-key:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
 // endpoint for exercises api-ninja
 app.get('/api/exercises', async (req, res) => {
-
+  try {
+    setCORSHeaders(res)
+  
   const cacheKey = 'exerciseData'
   const cachedData = cache.get(cacheKey)
   
@@ -51,7 +48,6 @@ app.get('/api/exercises', async (req, res) => {
     return res.json(cachedData)
   }
 
-  try {
     const muscle = req.query.muscle
     console.log("Received muscle:", muscle)
     const response = await axios({
@@ -69,12 +65,20 @@ app.get('/api/exercises', async (req, res) => {
 
 
 // endpoint for api key 2
-app.get('/api/api-key2', async (req, res) => {;
-  res.json({ apiKey2: apiKey2 })
-})
+app.get('/api/api-key2', async (req, res) => {
+  try {
+    setCORSHeaders(res)
+    res.json({ apiKey2: apiKey2 });
+  } catch (error) {
+    console.error('Error in /api/api-key2:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
 // endpoint for exercises rapid-api
 app.get('/api/exercises-rapidapi', async (req, res) => {
+  try {
+    setCORSHeaders(res);
   
   const { muscle } = req.query
   const cacheKey = `exerciseDataRapidAPI`
@@ -85,7 +89,6 @@ app.get('/api/exercises-rapidapi', async (req, res) => {
     return res.json(cachedData.data[muscle])
   }
 
-  try {
     console.log("Received muscle:", muscle)
     const response = await axios ({
       method: 'GET', 
