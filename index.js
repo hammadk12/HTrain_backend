@@ -1,7 +1,6 @@
 const express = require('express');
 const axios = require('axios')
 const NodeCache = require('node-cache')
-const cache = new NodeCache ({ stdTTL: 7200 })
 const cors = require('cors')
 require('dotenv').config()
 
@@ -9,8 +8,16 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const apiKey = process.env.API_KEY
 const apiKey2 = process.env.API_KEY_E
+const cache = new NodeCache ({ stdTTL: 7200 })
 
-app.use(cors())
+const frontendUrl = 'https://htrain-frontend-hammads-projects-216b65c7.vercel.app'
+
+app.use(cors({
+  origin: frontendUrl,
+  methods: ['GET', 'POST'],
+  credentials: true,
+  
+}))
 
 
 // endpoint for api key 1
