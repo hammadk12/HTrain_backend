@@ -10,25 +10,38 @@ const apiKey = process.env.API_KEY
 const apiKey2 = process.env.API_KEY_E
 const cache = new NodeCache ({ stdTTL: 7200 })
 
-const frontendUrl = 'https://htrain-frontend-hammads-projects-216b65c7.vercel.app'
+const allowedOrigings = [
+  'https://htrain-frontend-hammads-projects-216b65c7.vercel.app',
+  'https://htrain-frontend.vercel.app/'
+]
 
 app.use(cors({
-  origin: frontendUrl,
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigings.incluides(origin)) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  },
   methods: ['GET', 'POST'],
-  credentials: true,
-  
+  credentials: true
 }))
 
+// setting CORS headers explicitly
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  next();
+})
 
 // endpoint for api key 1
 app.get('/api/api-key', async (req, res) => {
-  res.header('Access-Control-Allow-Origin', '*');
   res.json({ apiKey: apiKey })
 })
 
 // endpoint for exercises api-ninja
 app.get('/api/exercises', async (req, res) => {
-  res.header('Access-Control-Allow-Origin', '*');
 
   const cacheKey = 'exerciseData'
   const cachedData = cache.get(cacheKey)
@@ -56,14 +69,12 @@ app.get('/api/exercises', async (req, res) => {
 
 
 // endpoint for api key 2
-app.get('/api/api-key2', async (req, res) => {
-  res.header('Access-Control-Allow-Origin', '*');
+app.get('/api/api-key2', async (req, res) => {;
   res.json({ apiKey2: apiKey2 })
 })
 
 // endpoint for exercises rapid-api
 app.get('/api/exercises-rapidapi', async (req, res) => {
-  res.header('Access-Control-Allow-Origin', '*');
   
   const { muscle } = req.query
   const cacheKey = `exerciseDataRapidAPI`
