@@ -59,7 +59,11 @@ app.get('/api/exercises', async (req, res) => {
     res.json(response.data)
     } catch (error) {
         console.error("Failed to fetch data:", error);
-        res.status(500).json({ error: 'Failed to fetch data' });
+        if (error.response && error.response.status === 429) {
+          res.status(429).json({error: 'API limit reached. Please try again later and contact admin'})
+        } else {
+          res.status(500).json({ error: 'Failed to fetch data' });
+        }
     }
 })
 
@@ -105,7 +109,12 @@ app.get('/api/exercises-rapidapi', async (req, res) => {
     res.json(response.data)
   } catch (error) {
     console.error('Failed to fetch data:', error);
-    res.status(500).json({ error: 'Failed to fetch data' });
+
+    if (error.response && error.response.status === 429) {
+      res.status(429).json({error: 'API limit reached. Please try again later and contact admin'})
+    } else {
+      res.status(500).json({ error: 'Failed to fetch data' });
+    }
   }
 })
 
